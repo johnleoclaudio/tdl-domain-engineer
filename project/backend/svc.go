@@ -2,6 +2,9 @@ package backend
 
 import (
 	"context"
+	"eats/backend/common/module"
+	"eats/backend/common/module/contracts"
+	"eats/backend/orders"
 	"errors"
 	"fmt"
 	"net/http"
@@ -11,9 +14,6 @@ import (
 	echo "github.com/labstack/echo/v4"
 
 	commonHTTP "eats/backend/common/http"
-	"eats/backend/common/module"
-	"eats/backend/common/module/contracts"
-	"eats/backend/orders"
 )
 
 type Svc struct {
@@ -24,10 +24,7 @@ type Svc struct {
 	dbPgx *pgxpool.Pool
 }
 
-func New(
-	ctx context.Context,
-	dbPgx *pgxpool.Pool,
-) (Svc, error) {
+func New(ctx context.Context, dbPgx *pgxpool.Pool) (Svc, error) {
 	e := commonHTTP.NewEcho()
 
 	// We use a pointer here so modules can register their contracts during Init(),
