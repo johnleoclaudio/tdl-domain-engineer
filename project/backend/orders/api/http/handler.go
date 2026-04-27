@@ -5,6 +5,7 @@ import (
 	"eats/backend/common"
 	"eats/backend/common/shared"
 	"eats/backend/orders/adapters/db/dbmodels"
+	"fmt"
 	"log/slog"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -23,29 +24,42 @@ func NewHandler(pgxDb *pgxpool.Pool) Handler {
 	}
 }
 
+func openapiAddressToSharedAddress(addr Address) (shared.Address, error) {
+	sharedAddr, err := shared.NewAddress(
+		addr.Line1,
+		addr.Line2,
+		addr.PostalCode,
+		addr.City,
+		addr.CountryCode,
+	)
+	if err != nil {
+		return shared.Address{}, err
+	}
+	return sharedAddr, nil
+}
+
 func (h Handler) RegisterCustomer(ctx context.Context, request RegisterCustomerRequestObject) (RegisterCustomerResponseObject, error) {
+	customer := request.Body
 	customerUUID := common.NewUUIDv7()
 
-	arg := dbmodels.InsertCustomerParams{
-		CustomerUuid: customerUUID,
-		Email:        string(request.Body.Email),
-		Address: shared.Address{
-			Line1:       request.Body.Address.Line1,
-			Line2:       request.Body.Address.Line2,
-			PostalCode:  request.Body.Address.PostalCode,
-			City:        request.Body.Address.City,
-			CountryCode: request.Body.Address.CountryCode,
-		},
+	queries := dbmodels.New(h.pgxDb)
+
+	commonAddress, err := openapiAddressToSharedAddress(customer.Address)
+	if err != nil {
+		return nil, fmt.Errorf("convert address failed: %w", err)
 	}
 
-	slog.Info("TANGINA", arg)
-
-	queries := dbmodels.New(h.pgxDb)
-	queries.InsertCustomer(ctx, arg)
-	// if err != nil {
-	//
-	// 	return RegisterCustomer400JSONResponse{}, nil
-	// }
+	err = queries.InsertCustomer(ctx, dbmodels.InsertCustomerParams{
+		CustomerUuid: customerUUID,
+		Name:         customer.Name,
+		Email:        string(customer.Email),
+		Address:      commonAddress,
+		PhoneNumber:  customer.PhoneNumber,
+	})
+	if err != nil {
+		slog.Error("Failed to Insert", err)
+		return RegisterCustomer400JSONResponse{}, nil
+	}
 
 	return RegisterCustomer201JSONResponse{
 		CustomerUuid: customerUUID,
