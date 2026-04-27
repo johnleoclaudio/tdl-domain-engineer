@@ -2,47 +2,36 @@ package http
 
 import (
 	"context"
+	"fmt"
+
+	"github.com/jackc/pgx/v5/pgxpool"
+
 	"eats/backend/common"
 	"eats/backend/common/shared"
 	"eats/backend/orders/adapters/db/dbmodels"
-	"fmt"
-	"log/slog"
-
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Handler struct {
-	pgxDb *pgxpool.Pool
+	db *pgxpool.Pool
 }
 
-func NewHandler(pgxDb *pgxpool.Pool) Handler {
-	if pgxDb == nil {
+func NewHandler(
+	db *pgxpool.Pool,
+) Handler {
+	if db == nil {
 		panic("db cannot be nil")
 	}
-	return Handler{
-		pgxDb: pgxDb,
-	}
-}
 
-func openapiAddressToSharedAddress(addr Address) (shared.Address, error) {
-	sharedAddr, err := shared.NewAddress(
-		addr.Line1,
-		addr.Line2,
-		addr.PostalCode,
-		addr.City,
-		addr.CountryCode,
-	)
-	if err != nil {
-		return shared.Address{}, err
+	return Handler{
+		db: db,
 	}
-	return sharedAddr, nil
 }
 
 func (h Handler) RegisterCustomer(ctx context.Context, request RegisterCustomerRequestObject) (RegisterCustomerResponseObject, error) {
 	customer := request.Body
 	customerUUID := common.NewUUIDv7()
 
-	queries := dbmodels.New(h.pgxDb)
+	queries := dbmodels.New(h.db)
 
 	commonAddress, err := openapiAddressToSharedAddress(customer.Address)
 	if err != nil {
@@ -57,13 +46,27 @@ func (h Handler) RegisterCustomer(ctx context.Context, request RegisterCustomerR
 		PhoneNumber:  customer.PhoneNumber,
 	})
 	if err != nil {
-		slog.Error("Failed to Insert", err)
-		return RegisterCustomer400JSONResponse{}, nil
+		return nil, fmt.Errorf("insert customer failed: %w", err)
 	}
 
 	return RegisterCustomer201JSONResponse{
 		CustomerUuid: customerUUID,
 	}, nil
+}
+
+func openapiAddressToSharedAddress(addr Address) (shared.Address, error) {
+	sharedAddr, err := shared.NewAddress(
+		addr.Line1,
+		addr.Line2,
+		addr.PostalCode,
+		addr.City,
+		addr.CountryCode,
+	)
+	if err != nil {
+		return shared.Address{}, err
+	}
+
+	return sharedAddr, nil
 }
 
 func Register(ctx context.Context, e EchoRouter, handler Handler) error {
