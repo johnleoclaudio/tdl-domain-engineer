@@ -2,13 +2,13 @@ package orders
 
 import (
 	"context"
+	"eats/backend/common"
+	"eats/backend/common/module"
+	"eats/backend/common/module/contracts"
 	"embed"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"eats/backend/common"
-	"eats/backend/common/module"
-	"eats/backend/common/module/contracts"
 	http2 "eats/backend/orders/api/http"
 	ordersModule "eats/backend/orders/api/module"
 )
@@ -35,7 +35,7 @@ func (m *Module) Name() module.Name {
 var embedMigrations embed.FS
 
 func (m *Module) Init(ctx context.Context) error {
-	httpHandler := http2.NewHandler()
+	httpHandler := http2.NewHandler(m.pgxDb)
 	m.httpHandler = httpHandler
 
 	if err := common.MigrateDatabaseUp(

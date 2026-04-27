@@ -2,6 +2,10 @@ package backend
 
 import (
 	"context"
+	"eats/backend/common/log"
+	"eats/backend/common/module"
+	"eats/backend/common/module/contracts"
+	"eats/backend/orders"
 	"errors"
 	"fmt"
 	"net/http"
@@ -11,10 +15,6 @@ import (
 	echo "github.com/labstack/echo/v4"
 
 	commonHTTP "eats/backend/common/http"
-	"eats/backend/common/log"
-	"eats/backend/common/module"
-	"eats/backend/common/module/contracts"
-	"eats/backend/orders"
 )
 
 type Svc struct {
