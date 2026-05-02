@@ -31,7 +31,7 @@ func (h Handler) RegisterCustomer(ctx context.Context, request RegisterCustomerR
 		return nil, fmt.Errorf("invalid address: %w", err)
 	}
 
-	customerUUID := app.CustomerUUID{common.NewUUIDv7()}
+	customerUUID := CustomerUUID{common.NewUUIDv7()}
 
 	err = h.service.RegisterCustomer(ctx, app.Customer{
 		CustomerUUID: customerUUID,
