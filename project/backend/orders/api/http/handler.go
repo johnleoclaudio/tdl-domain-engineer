@@ -2,11 +2,10 @@ package http
 
 import (
 	"context"
-	"fmt"
-
 	"eats/backend/common"
 	"eats/backend/common/shared"
 	"eats/backend/orders/app"
+	"fmt"
 )
 
 type Handler struct {
@@ -37,10 +36,8 @@ func (h Handler) RegisterCustomer(ctx context.Context, request RegisterCustomerR
 		CustomerUUID: customerUUID,
 		Name:         request.Body.Name,
 		Email:        string(request.Body.Email),
-		// address should be ideally normalized to ensure consistent city names and postal codes
-		// across customers, restaurants, and delivery addresses
-		Address:     addr,
-		PhoneNumber: request.Body.PhoneNumber,
+		Address:      addr,
+		PhoneNumber:  request.Body.PhoneNumber,
 	})
 	if err != nil {
 		return nil, err

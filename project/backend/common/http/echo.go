@@ -1,14 +1,13 @@
 package http
 
 import (
+	"eats/backend/common"
+	"eats/backend/common/log"
 	"errors"
 	"log/slog"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-
-	"eats/backend/common"
-	"eats/backend/common/log"
 )
 
 func NewEcho() *echo.Echo {
@@ -16,7 +15,7 @@ func NewEcho() *echo.Echo {
 	e.HideBanner = true
 
 	useMiddlewares(e)
-	e.HTTPErrorHandler = HandleError
+	e.HTTPErrorHandler = common.EchoErrorHandler
 	e.Logger = common.NewEchoSlogAdapter(slog.Default())
 
 	e.GET("/health", func(c echo.Context) error {

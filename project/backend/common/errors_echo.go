@@ -1,13 +1,12 @@
 package common
 
 import (
+	"eats/backend/common/log"
 	"errors"
 	"net/http"
 	"strings"
 
 	echo "github.com/labstack/echo/v4"
-
-	"eats/backend/common/log"
 )
 
 func EchoErrorHandler(err error, c echo.Context) {
