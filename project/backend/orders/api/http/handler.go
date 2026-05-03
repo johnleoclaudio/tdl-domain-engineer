@@ -2,10 +2,11 @@ package http
 
 import (
 	"context"
+	"fmt"
+
 	"eats/backend/common"
 	"eats/backend/common/shared"
 	"eats/backend/orders/app"
-	"fmt"
 )
 
 type Handler struct {

@@ -1,11 +1,12 @@
 package http
 
 import (
-	"eats/backend/common"
-	"eats/backend/common/log"
 	"errors"
 	"log/slog"
 	"net/http"
+
+	"eats/backend/common"
+	"eats/backend/common/log"
 
 	"github.com/labstack/echo/v4"
 )

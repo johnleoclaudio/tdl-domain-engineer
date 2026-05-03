@@ -1,10 +1,11 @@
 package common
 
 import (
-	"eats/backend/common/log"
 	"errors"
 	"net/http"
 	"strings"
+
+	"eats/backend/common/log"
 
 	echo "github.com/labstack/echo/v4"
 )

@@ -2,9 +2,10 @@ package app
 
 import (
 	"context"
+	"strings"
+
 	"eats/backend/common"
 	"eats/backend/common/shared"
-	"strings"
 )
 
 type CustomerUUID struct {
